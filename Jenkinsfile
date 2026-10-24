@@ -14,6 +14,8 @@ pipeline {
                description: 'Public IP of the Azure VM (terraform output public_ip_address). Empty = use the AZURE_VM_IP environment variable.')
         string(name: 'VM_USER', defaultValue: 'azureuser',
                description: 'SSH user on the VM')
+        string(name: 'SSH_PORT', defaultValue: '',
+               description: 'SSH port on the VM. Empty = use AZURE_SSH_PORT, or 22 if that is not set.')
         booleanParam(name: 'SKIP_CHECKS', defaultValue: false,
                description: 'DEMO ONLY: skip tests and data validation so a bad commit reaches the VM and the auto-rollback can be shown.')
     }
@@ -30,6 +32,8 @@ pipeline {
 
     environment {
         DEPLOY_HOST = "${params.VM_IP ?: (env.AZURE_VM_IP ?: '')}"
+        // SSH port: 22, or 443 on networks that block outgoing port 22 (set AZURE_SSH_PORT)
+        SSH_PORT    = "${params.SSH_PORT ?: (env.AZURE_SSH_PORT ?: '22')}"
         SSH_OPTS    = '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
         PACKAGE     = "depthub-${env.BUILD_NUMBER}.tar.gz"
     }
@@ -88,8 +92,8 @@ pipeline {
                 }
                 sshagent(credentials: ['azure-vm-ssh']) {
                     sh '''
-                        scp $SSH_OPTS "$PACKAGE" scripts/deploy.sh "$VM_USER@$DEPLOY_HOST:/tmp/"
-                        ssh $SSH_OPTS "$VM_USER@$DEPLOY_HOST" "bash /tmp/deploy.sh $BUILD_NUMBER /tmp/$PACKAGE"
+                        scp -P "$SSH_PORT" $SSH_OPTS "$PACKAGE" scripts/deploy.sh "$VM_USER@$DEPLOY_HOST:/tmp/"
+                        ssh -p "$SSH_PORT" $SSH_OPTS "$VM_USER@$DEPLOY_HOST" "bash /tmp/deploy.sh $BUILD_NUMBER /tmp/$PACKAGE"
                     '''
                 }
             }

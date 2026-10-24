@@ -3,8 +3,11 @@
 subscription_id     = "00000000-0000-0000-0000-000000000000"
 ssh_public_key_path = "~/.ssh/id_rsa.pub"
 
-# Optional (defaults shown):
+# Optional (defaults shown). Change these if your subscription cannot create the default size
+# in the default region (common on Azure for Students). Check with:
+#   az vm list-skus --location <region> --resource-type virtualMachines --size Standard_B1s -o table
 # location           = "centralindia"
 # vm_size            = "Standard_B1s"
+# image_sku          = "22_04-lts-gen2"   # use "22_04-lts-arm64" for ARM sizes (e.g. Standard_B2pts_v2)
 # admin_username     = "azureuser"
 # allowed_ssh_source = "*"

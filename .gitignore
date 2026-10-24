@@ -3,6 +3,8 @@
 *.tfstate
 *.tfstate.*
 crash.log
+tfplan
+apply-output.txt
 *.tfvars
 !terraform.tfvars.example
 # (commit .terraform.lock.hcl so everyone gets the same provider version)

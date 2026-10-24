@@ -8,6 +8,11 @@ output "ssh_command" {
   value       = "ssh ${var.admin_username}@${azurerm_public_ip.public_ip.ip_address}"
 }
 
+output "ssh_command_alt_port" {
+  description = "Same login on the alternate port, for networks that block port 22."
+  value       = "ssh -p ${var.ssh_alt_port} ${var.admin_username}@${azurerm_public_ip.public_ip.ip_address}"
+}
+
 output "site_url" {
   description = "Where the website will be after the first Jenkins deploy."
   value       = "http://${azurerm_public_ip.public_ip.ip_address}/"

@@ -60,6 +60,20 @@ resource "azurerm_network_security_group" "nsg" {
     destination_address_prefix = "*"
   }
 
+  # Second SSH port (443). Many college and office networks block outgoing port 22,
+  # but allow 443. cloud-init makes sshd listen on both ports, with the same key-only login.
+  security_rule {
+    name                       = "allow-ssh-alt"
+    priority                   = 105
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = tostring(var.ssh_alt_port)
+    source_address_prefix      = var.allowed_ssh_source
+    destination_address_prefix = "*"
+  }
+
   # Port 80: visitors open the website here.
   security_rule {
     name                       = "allow-http"
@@ -129,12 +143,13 @@ resource "azurerm_linux_virtual_machine" "vm" {
   source_image_reference {
     publisher = "Canonical"
     offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts-gen2"
+    sku       = var.image_sku
     version   = "latest"
   }
 
   # cloud-init runs once on first boot: installs nginx + python and prepares /opt/depthub.
   custom_data = base64encode(templatefile("${path.module}/cloud-init.yaml", {
     admin_username = var.admin_username
+    ssh_alt_port   = var.ssh_alt_port
   }))
 }

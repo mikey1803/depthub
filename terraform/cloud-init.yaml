@@ -48,6 +48,14 @@ write_files:
       [Install]
       WantedBy=multi-user.target
 
+  # sshd also listens on ${ssh_alt_port}: many networks block outgoing port 22 but allow 443.
+  # Login is still key-only (Azure turns password login off).
+  - path: /etc/ssh/sshd_config.d/10-depthub.conf
+    permissions: "0644"
+    content: |
+      Port 22
+      Port ${ssh_alt_port}
+
   # lets deploy.sh restart ONLY this one service without a sudo password
   - path: /etc/sudoers.d/depthub
     permissions: "0440"
@@ -60,6 +68,7 @@ runcmd:
   - rm -f /etc/nginx/sites-enabled/default
   - ln -sf /etc/nginx/sites-available/depthub /etc/nginx/sites-enabled/depthub
   - systemctl daemon-reload
+  - systemctl restart ssh
   # enabled but not started: there is nothing in /opt/depthub/current until the first deploy
   - systemctl enable depthub
   - systemctl enable nginx
