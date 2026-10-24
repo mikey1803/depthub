@@ -28,6 +28,16 @@ A running record of how DeptHub was taken from code to a live deployment. Useful
 | Second `terraform apply` | `1 added, 1 changed, 1 destroyed`: the VM was replaced (changing cloud-init `custom_data` forces a new VM), the NSG was updated in place, and the static public IP stayed the same. Nothing had been deployed yet, so nothing was lost (VM creation took 53s). |
 | Verification | SSH worked on both 22 and 443, `scp -P 443` worked, sshd listened on `0.0.0.0:22` and `0.0.0.0:443`, cloud-init status `done`, nginx 1.18 active, `depthub` service enabled, `/opt/depthub/releases` owned by `azureuser`. `http://172.198.62.151/` returned `502 Bad Gateway`, which is correct until the first deploy (nginx is up, the app is not deployed yet). |
 
+## Jenkins configuration
+
+| Step | What happened |
+|---|---|
+| Start | Jenkins 2.580.1 (Java 21) runs as a systemd service inside WSL2 Ubuntu 22.04 and is reachable from Windows at http://localhost:8080. WSL stops its VM when idle, which would kill Poll SCM, so a hidden `wsl ... sleep infinity` session keeps it alive (it must be restarted after a Windows reboot). |
+| Setup wizard | Done by the user in the browser: unlock, "Install suggested plugins", create the admin user `mikey1803` (the password was typed only by the user). |
+| Access for automation | The user created an API token and stored it with a hidden terminal prompt in a root-only file inside WSL (`/root/.jenkins-api`). It was never typed into the chat. My first attempt (a long one-line `wsl ... bash -c '...'` command) failed because PowerShell mangled the embedded quotes (`>>` continuation prompt), so a short helper script was used instead. |
+| Plugins | The suggested plugins already included Git, GitHub, Pipeline (workflow-aggregator), Email Extension and Credentials. Only **SSH Agent** was missing; it was installed through the update center, which needs a restart before the plugin loads. |
+| Provisioning (Jenkins script console) | Created credential `azure-vm-ssh` (user `azureuser`, from the key file; the temporary copy was shredded afterwards), global environment variables `AZURE_VM_IP`, `AZURE_SSH_PORT=443` and `NOTIFY_EMAIL`, Jenkins admin email, Gmail SMTP settings in Extended E-mail (smtp.gmail.com, port 465, SSL), and the pipeline job `depthub` (Pipeline script from SCM, https://github.com/mikey1803/depthub.git, branch `*/main`, `Jenkinsfile`, Poll SCM `H/2 * * * *`). The job was created **disabled** so no build starts before the email password is set. |
+
 ## VM size and region
 
 Standard_B1s was not available in Central India for the Azure for Students subscription; VM size and region were parameterized as Terraform variables to switch deployment without code changes.

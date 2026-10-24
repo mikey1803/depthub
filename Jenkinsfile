@@ -34,6 +34,8 @@ pipeline {
         DEPLOY_HOST = "${params.VM_IP ?: (env.AZURE_VM_IP ?: '')}"
         // SSH port: 22, or 443 on networks that block outgoing port 22 (set AZURE_SSH_PORT)
         SSH_PORT    = "${params.SSH_PORT ?: (env.AZURE_SSH_PORT ?: '22')}"
+        // Parameters are empty on the very first build (Jenkins has not read them yet), so always fall back
+        SSH_USER    = "${params.VM_USER ?: 'azureuser'}"
         SSH_OPTS    = '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
         PACKAGE     = "depthub-${env.BUILD_NUMBER}.tar.gz"
     }
@@ -88,13 +90,21 @@ pipeline {
                     if (!env.DEPLOY_HOST) {
                         error('No VM address. Set the VM_IP parameter or the AZURE_VM_IP environment variable.')
                     }
-                    env.DEPLOY_ATTEMPTED = 'true'
                 }
                 sshagent(credentials: ['azure-vm-ssh']) {
-                    sh '''
-                        scp -P "$SSH_PORT" $SSH_OPTS "$PACKAGE" scripts/deploy.sh "$VM_USER@$DEPLOY_HOST:/tmp/"
-                        ssh -p "$SSH_PORT" $SSH_OPTS "$VM_USER@$DEPLOY_HOST" "bash /tmp/deploy.sh $BUILD_NUMBER /tmp/$PACKAGE"
-                    '''
+                    sh 'scp -P "$SSH_PORT" $SSH_OPTS "$PACKAGE" scripts/deploy.sh "$SSH_USER@$DEPLOY_HOST:/tmp/"'
+                    script {
+                        // deploy.sh exits 1 when the new release failed its health check (and was rolled back).
+                        // Any other failure code (e.g. 255 = cannot connect) means the script never judged the release.
+                        def rc = sh(returnStatus: true,
+                                    script: 'ssh -p "$SSH_PORT" $SSH_OPTS "$SSH_USER@$DEPLOY_HOST" "bash /tmp/deploy.sh $BUILD_NUMBER /tmp/$PACKAGE"')
+                        if (rc == 1) {
+                            env.ROLLED_BACK = 'true'
+                            error('deploy.sh reported a failed deploy: the previous version is still live (rolled back).')
+                        } else if (rc != 0) {
+                            error("ssh to the VM failed with exit code ${rc}.")
+                        }
+                    }
                 }
             }
         }
@@ -124,9 +134,9 @@ Build:   ${env.BUILD_URL}
         failure {
             script {
                 if (env.NOTIFY_EMAIL) {
-                    // Only claim a rollback if the deploy step really ran
-                    def what = 'The build failed before the deploy step, so the live site was not changed.'
-                    if (env.DEPLOY_ATTEMPTED == 'true') {
+                    // Only claim a rollback if deploy.sh itself reported the failed deploy
+                    def what = 'The build failed before the new version went live, so the live site was not changed.'
+                    if (env.ROLLED_BACK == 'true') {
                         what = 'The deploy failed its health check and the site was rolled back to the last working version.'
                     }
                     emailext(
