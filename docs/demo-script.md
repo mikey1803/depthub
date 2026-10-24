@@ -21,7 +21,7 @@
 | Time | Say | Do |
 |---|---|---|
 | 1:20 | "Now someone makes a mistake: a category that doesn't exist." | Change a notice's `"category"` to `"Gossip"`. Commit and push. |
-| 1:35 | "Jenkins stops at Validate Data. It names the exact problem, and nothing was deployed, so the live site is untouched." | Show the red stage and the console line `unknown category 'Gossip'`. Refresh the site: still fine. Show the failure email. |
+| 1:35 | "Jenkins stops before anything is deployed. The test suite already checks the real data files, so it fails at Install & Test with the exact problem. Validate Data is a second safety net behind it. The live site is untouched." | Show the red **Install & Test** stage (later stages are skipped) and the console line `unknown category 'Gossip'`. Refresh the site: still fine. Show the failure email. |
 
 **2b. Rollback catches it (if the bad data gets past the checks)**
 
@@ -36,6 +36,7 @@ Pre-step: on the Jenkins job, use **Build with Parameters** and tick **SKIP_CHEC
 **Clean up after the demo:** revert the bad commit (`git revert HEAD`, `git push`) so `main` is healthy again.
 
 ## Tips
+- Which stage fails first on bad data: `tests/test_validate.py::test_real_repo_data_passes` runs the validator on the real `data/` folder, so **Install & Test** catches it before **Validate Data** even runs. Both use the same rules (`scripts/validate_data.py`).
 - Rehearse once. A deploy takes about a minute because pip installs the packages into a fresh venv.
 - If the webhook is slow (ngrok), click **Build Now**; mention that Poll SCM is the safety net.
 - Part 2b is the long one. If you are short on time, show it from a recorded run or screenshot.
