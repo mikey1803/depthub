@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Deployment History{% endblock %}
+{% block content %}
+<h1>Deployment History</h1>
+<p class="muted">Every deployment made by the Jenkins pipeline, newest first.</p>
+
+{% if history %}
+  <div class="table-wrap">
+    <table class="deploys">
+      <thead>
+        <tr><th>Build</th><th>Commit</th><th>Message</th><th>Author</th><th>When</th><th>Result</th></tr>
+      </thead>
+      <tbody>
+        {% for d in history %}
+          <tr>
+            <td>v{{ d.build }}</td>
+            <td><code>{{ d.commit_short or (d.commit or '')[:7] }}</code></td>
+            <td>{{ d.message }}</td>
+            <td>{{ d.author }}</td>
+            <td>{{ d.timestamp }}<br><span class="muted">{{ d.ago }}</span></td>
+            <td><span class="tag {% if d.status == 'success' %}tag-ok{% else %}tag-urgent{% endif %}">{{ d.status or 'success' }}</span></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <p class="empty">No deployments recorded yet.</p>
+{% endif %}
+{% endblock %}

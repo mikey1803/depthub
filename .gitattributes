@@ -1,0 +1,5 @@
+# Always use LF line endings: these files run on Linux (Jenkins, the Azure VM)
+* text=auto eol=lf
+*.sh text eol=lf
+Jenkinsfile text eol=lf
+*.png binary

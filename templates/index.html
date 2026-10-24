@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Notice Board{% endblock %}
+{% block content %}
+<h1>Notice Board</h1>
+
+<nav class="filter-bar" aria-label="Filter notices by category">
+  <a class="chip {% if not selected %}active{% endif %}" href="{{ url_for('index') }}">All</a>
+  {% for category in categories %}
+    <a class="chip chip-{{ category|lower }} {% if selected == category %}active{% endif %}"
+       href="{{ url_for('index', category=category) }}">{{ category }}</a>
+  {% endfor %}
+</nav>
+
+{% if pinned %}
+  <section>
+    <h2 class="section-title pinned-title">Pinned: urgent</h2>
+    <div class="grid">
+      {% for notice in pinned %}{% include "_notice_card.html" %}{% endfor %}
+    </div>
+  </section>
+{% endif %}
+
+{% if others %}
+  <section>
+    {% if pinned %}<h2 class="section-title">Other notices</h2>{% endif %}
+    <div class="grid">
+      {% for notice in others %}{% include "_notice_card.html" %}{% endfor %}
+    </div>
+  </section>
+{% endif %}
+
+{% if not pinned and not others %}
+  <p class="empty">No active notices{% if selected %} in {{ selected }}{% endif %}.</p>
+{% endif %}
+{% endblock %}

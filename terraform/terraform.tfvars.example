@@ -1,0 +1,10 @@
+# Copy this file to terraform.tfvars and fill it in. terraform.tfvars is git-ignored.
+
+subscription_id     = "00000000-0000-0000-0000-000000000000"
+ssh_public_key_path = "~/.ssh/id_rsa.pub"
+
+# Optional (defaults shown):
+# location           = "centralindia"
+# vm_size            = "Standard_B1s"
+# admin_username     = "azureuser"
+# allowed_ssh_source = "*"

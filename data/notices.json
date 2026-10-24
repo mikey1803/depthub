@@ -1,0 +1,61 @@
+[
+  {
+    "id": 1,
+    "title": "Internal Assessment II: Hall Ticket Collection",
+    "body": "Hall tickets for Internal Assessment II are ready. Collect them from the department office with your college ID card. Students with attendance below 75% must meet their class advisor first.",
+    "category": "Exam",
+    "urgent": true,
+    "posted_on": "2026-10-22",
+    "deadline": "2026-10-28T16:00:00",
+    "expires_on": "2026-10-29"
+  },
+  {
+    "id": 2,
+    "title": "TCS Digital Drive: Registration Closing Soon",
+    "body": "Final-year AI & DS students can register for the TCS Digital hiring drive through the placement portal. Keep your updated resume and CGPA proof ready. Only registered students will get the test link.",
+    "category": "Placement",
+    "urgent": true,
+    "posted_on": "2026-10-21",
+    "deadline": "2026-11-05T17:00:00",
+    "expires_on": "2026-11-06"
+  },
+  {
+    "id": 3,
+    "title": "Workshop: MLOps with Docker and Kubernetes",
+    "body": "A two-day hands-on workshop on packaging and deploying machine learning models, led by an industry speaker. Seats are limited to 60. Bring your own laptop with Docker installed.",
+    "category": "Event",
+    "urgent": false,
+    "posted_on": "2026-10-20",
+    "deadline": "2026-11-10T23:59:00",
+    "expires_on": "2026-11-12"
+  },
+  {
+    "id": 4,
+    "title": "Library Timings Extended During Exams",
+    "body": "The central library will stay open until 9 PM on all working days during the internal assessment period. The digital library lab remains open till 8 PM.",
+    "category": "General",
+    "urgent": false,
+    "posted_on": "2026-10-19",
+    "expires_on": "2026-11-30"
+  },
+  {
+    "id": 5,
+    "title": "Hackathon: AI for Good 2026",
+    "body": "A 24-hour inter-department hackathon on AI for social good. Teams of 3 to 4. Problem statements will be shared on registration. Cash prizes for the top three teams.",
+    "category": "Event",
+    "urgent": false,
+    "posted_on": "2026-10-18",
+    "deadline": "2026-11-20T12:00:00",
+    "expires_on": "2026-11-21"
+  },
+  {
+    "id": 6,
+    "title": "Lab Record Submission: Data Structures",
+    "body": "Submit the completed Data Structures lab record to your lab in-charge. Late submissions will not be accepted after the due date.",
+    "category": "Exam",
+    "urgent": false,
+    "posted_on": "2026-10-05",
+    "deadline": "2026-10-14T16:00:00",
+    "expires_on": "2026-10-15"
+  }
+]

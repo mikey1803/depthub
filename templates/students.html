@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Student Showcase{% endblock %}
+{% block content %}
+<h1>Student Showcase</h1>
+<p class="muted">Click a skill to see only the students who have it.</p>
+
+<nav class="filter-bar" aria-label="Filter students by skill">
+  <a class="chip {% if not selected %}active{% endif %}" href="{{ url_for('students') }}">All</a>
+  {% for skill in skills %}
+    <a class="chip {% if selected == skill %}active{% endif %}" href="{{ url_for('students', skill=skill) }}">{{ skill }}</a>
+  {% endfor %}
+</nav>
+
+<div class="grid">
+  {% for student in students %}
+    <article class="card student">
+      <h3>{{ student.name }}</h3>
+      <p class="role">{{ student.role }}</p>
+      <div class="skills">
+        {% for skill in student.skills %}
+          <a class="chip small {% if selected == skill %}active{% endif %}" href="{{ url_for('students', skill=skill) }}">{{ skill }}</a>
+        {% endfor %}
+      </div>
+      {% if student.projects %}
+        <h4>Projects</h4>
+        <ul class="projects">
+          {% for project in student.projects %}
+            <li>
+              <a href="{{ project.link }}" target="_blank" rel="noopener">{{ project.title }}</a>
+              <span>{{ project.description }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      <a class="github" href="https://github.com/{{ student.github }}" target="_blank" rel="noopener">github.com/{{ student.github }}</a>
+    </article>
+  {% endfor %}
+</div>
+{% endblock %}

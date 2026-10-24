@@ -1,0 +1,16 @@
+<article class="card notice cat-{{ notice.category|lower }}{% if notice.urgent %} urgent{% endif %}">
+  <div class="tags">
+    {% if notice.urgent %}<span class="tag tag-urgent">Urgent</span>{% endif %}
+    <span class="tag tag-{{ notice.category|lower }}">{{ notice.category }}</span>
+  </div>
+  <h3><a href="{{ url_for('notice_detail', notice_id=notice.id) }}">{{ notice.title }}</a></h3>
+  <p>{{ notice.body }}</p>
+  <div class="meta">
+    <span>Posted {{ notice.posted_on|pretty_date }}</span>
+    <span>Expires {{ notice.expires_on|pretty_date }}</span>
+    {% if notice.deadline_iso %}
+      <span class="countdown" data-deadline="{{ notice.deadline_iso }}">Due soon</span>
+    {% endif %}
+    <a class="qr-link" href="{{ url_for('notice_detail', notice_id=notice.id) }}">Details &amp; QR</a>
+  </div>
+</article>

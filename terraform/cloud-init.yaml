@@ -1,0 +1,66 @@
+#cloud-config
+# Runs once, on the VM's first boot. Terraform fills in ${admin_username}.
+# After this, Jenkins only has to copy a release into /opt/depthub/releases/ and run deploy.sh.
+
+package_update: true
+packages:
+  - python3
+  - python3-venv
+  - python3-pip
+  - nginx
+  - curl
+
+write_files:
+  # nginx: takes visitors on port 80 and hands them to gunicorn on port 8000
+  - path: /etc/nginx/sites-available/depthub
+    permissions: "0644"
+    content: |
+      server {
+          listen 80 default_server;
+          server_name _;
+
+          location / {
+              proxy_pass http://127.0.0.1:8000;
+              proxy_set_header Host $host;
+              proxy_set_header X-Real-IP $remote_addr;
+              proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+              proxy_set_header X-Forwarded-Proto $scheme;
+          }
+      }
+
+  # systemd: keeps gunicorn running and restarts it if it crashes.
+  # It always runs whatever /opt/depthub/current points to, so a deploy = move the symlink + restart.
+  - path: /etc/systemd/system/depthub.service
+    permissions: "0644"
+    content: |
+      [Unit]
+      Description=DeptHub (gunicorn)
+      After=network.target
+
+      [Service]
+      User=${admin_username}
+      WorkingDirectory=/opt/depthub/current
+      Environment=DEPTHUB_HISTORY=/opt/depthub/deploy_history.jsonl
+      ExecStart=/opt/depthub/current/venv/bin/gunicorn --workers 2 --bind 127.0.0.1:8000 app:app
+      Restart=on-failure
+      RestartSec=3
+
+      [Install]
+      WantedBy=multi-user.target
+
+  # lets deploy.sh restart ONLY this one service without a sudo password
+  - path: /etc/sudoers.d/depthub
+    permissions: "0440"
+    content: |
+      ${admin_username} ALL=(root) NOPASSWD: /usr/bin/systemctl restart depthub, /bin/systemctl restart depthub
+
+runcmd:
+  - mkdir -p /opt/depthub/releases
+  - chown -R ${admin_username}:${admin_username} /opt/depthub
+  - rm -f /etc/nginx/sites-enabled/default
+  - ln -sf /etc/nginx/sites-available/depthub /etc/nginx/sites-enabled/depthub
+  - systemctl daemon-reload
+  # enabled but not started: there is nothing in /opt/depthub/current until the first deploy
+  - systemctl enable depthub
+  - systemctl enable nginx
+  - systemctl restart nginx

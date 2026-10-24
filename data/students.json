@@ -1,0 +1,82 @@
+[
+  {
+    "name": "Ananya Rao",
+    "role": "Final Year, Machine Learning Enthusiast",
+    "skills": ["Python", "TensorFlow", "Pandas", "SQL"],
+    "projects": [
+      {
+        "title": "Crop Disease Detector",
+        "description": "CNN model that identifies leaf diseases from a phone photo, with 93% test accuracy.",
+        "link": "https://github.com/ananya-rao/crop-disease-detector"
+      },
+      {
+        "title": "Campus Footfall Predictor",
+        "description": "Time-series forecast of canteen and library crowd levels.",
+        "link": "https://github.com/ananya-rao/footfall-predictor"
+      }
+    ],
+    "github": "ananya-rao"
+  },
+  {
+    "name": "Rohit Samuel",
+    "role": "Third Year, Full-Stack Developer",
+    "skills": ["Python", "Flask", "JavaScript", "Docker"],
+    "projects": [
+      {
+        "title": "Placement Tracker",
+        "description": "Web app where students track applications and interview rounds.",
+        "link": "https://github.com/rohit-samuel/placement-tracker"
+      }
+    ],
+    "github": "rohit-samuel"
+  },
+  {
+    "name": "Divya Menon",
+    "role": "Final Year, Data Analyst",
+    "skills": ["SQL", "Power BI", "Python", "Statistics"],
+    "projects": [
+      {
+        "title": "Student Result Dashboard",
+        "description": "Interactive dashboard analysing five semesters of department results.",
+        "link": "https://github.com/divya-menon/result-dashboard"
+      },
+      {
+        "title": "Retail Sales Insights",
+        "description": "Exploratory analysis and sales forecast on a public retail dataset.",
+        "link": "https://github.com/divya-menon/retail-insights"
+      }
+    ],
+    "github": "divya-menon"
+  },
+  {
+    "name": "Joel Thomas",
+    "role": "Second Year, NLP Beginner",
+    "skills": ["Python", "NLTK", "Git", "Linux"],
+    "projects": [
+      {
+        "title": "Notice Summariser",
+        "description": "Summarises long circulars into three lines using extractive NLP.",
+        "link": "https://github.com/joel-thomas/notice-summariser"
+      }
+    ],
+    "github": "joel-thomas"
+  },
+  {
+    "name": "Meera Krishnan",
+    "role": "Third Year, Cloud and DevOps Learner",
+    "skills": ["Docker", "Terraform", "Linux", "Jenkins"],
+    "projects": [
+      {
+        "title": "Auto-Deploy Pipeline",
+        "description": "Jenkins pipeline that builds a Docker image and deploys it to a cloud VM on every commit.",
+        "link": "https://github.com/meera-krishnan/auto-deploy-pipeline"
+      },
+      {
+        "title": "Infra as Code Starter",
+        "description": "Terraform templates for a small web server on Azure.",
+        "link": "https://github.com/meera-krishnan/iac-starter"
+      }
+    ],
+    "github": "meera-krishnan"
+  }
+]

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}{{ notice.title }}{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('index') }}">&larr; Back to notices</a></p>
+
+<article class="card notice detail cat-{{ notice.category|lower }}{% if notice.urgent %} urgent{% endif %}">
+  <div class="tags">
+    {% if notice.urgent %}<span class="tag tag-urgent">Urgent</span>{% endif %}
+    <span class="tag tag-{{ notice.category|lower }}">{{ notice.category }}</span>
+  </div>
+  <h1>{{ notice.title }}</h1>
+  <p class="lead">{{ notice.body }}</p>
+  <div class="meta">
+    <span>Posted {{ notice.posted_on|pretty_date }}</span>
+    <span>Expires {{ notice.expires_on|pretty_date }}</span>
+    {% if notice.deadline_iso %}
+      <span class="countdown" data-deadline="{{ notice.deadline_iso }}">Due soon</span>
+    {% endif %}
+  </div>
+
+  <div class="qr-box">
+    <img src="{{ url_for('notice_qr', notice_id=notice.id) }}" alt="QR code for this notice" width="180" height="180">
+    <p>Scan to open this notice on your phone.</p>
+  </div>
+</article>
+{% endblock %}

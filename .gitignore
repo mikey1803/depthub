@@ -1,0 +1,33 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfvars
+!terraform.tfvars.example
+# (commit .terraform.lock.hcl so everyone gets the same provider version)
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Build output
+version.json
+*.tar.gz
+
+# Secrets
+.env
+*.pem
+*.key
+id_rsa
+id_rsa.pub
+secrets*
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
