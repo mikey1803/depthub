@@ -5,9 +5,9 @@
     "body": "Hall tickets for Internal Assessment II are ready. Collect them from the department office with your college ID card. Students with attendance below 75% must meet their class advisor first.",
     "category": "Exam",
     "urgent": true,
-    "posted_on": "2026-10-22",
-    "deadline": "2026-10-28T16:00:00",
-    "expires_on": "2026-10-29"
+    "posted_on": "2026-10-24",
+    "deadline": "2026-11-03T16:00:00",
+    "expires_on": "2026-11-04"
   },
   {
     "id": 2,
@@ -15,9 +15,9 @@
     "body": "Final-year AI & DS students can register for the TCS Digital hiring drive through the placement portal. Keep your updated resume and CGPA proof ready. Only registered students will get the test link.",
     "category": "Placement",
     "urgent": true,
-    "posted_on": "2026-10-21",
-    "deadline": "2026-11-05T17:00:00",
-    "expires_on": "2026-11-06"
+    "posted_on": "2026-10-24",
+    "deadline": "2026-11-12T17:00:00",
+    "expires_on": "2026-11-13"
   },
   {
     "id": 3,
@@ -26,8 +26,8 @@
     "category": "Event",
     "urgent": false,
     "posted_on": "2026-10-20",
-    "deadline": "2026-11-10T23:59:00",
-    "expires_on": "2026-11-12"
+    "deadline": "2026-11-18T23:59:00",
+    "expires_on": "2026-11-20"
   },
   {
     "id": 4,
@@ -36,7 +36,7 @@
     "category": "General",
     "urgent": false,
     "posted_on": "2026-10-19",
-    "expires_on": "2026-11-30"
+    "expires_on": "2026-12-15"
   },
   {
     "id": 5,
@@ -45,8 +45,8 @@
     "category": "Event",
     "urgent": false,
     "posted_on": "2026-10-18",
-    "deadline": "2026-11-20T12:00:00",
-    "expires_on": "2026-11-21"
+    "deadline": "2026-11-27T12:00:00",
+    "expires_on": "2026-11-28"
   },
   {
     "id": 6,
