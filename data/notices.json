@@ -23,7 +23,7 @@
     "id": 3,
     "title": "Workshop: MLOps with Docker and Kubernetes",
     "body": "A two-day hands-on workshop on packaging and deploying machine learning models, led by an industry speaker. Seats are limited to 60. Bring your own laptop with Docker installed.",
-    "category": "Gossip",
+    "category": "Event",
     "urgent": false,
     "posted_on": "2026-10-20",
     "deadline": "2026-11-18T23:59:00",
