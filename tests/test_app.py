@@ -72,6 +72,19 @@ def test_deadline_is_sent_to_browser_with_timezone(client):
     assert 'data-deadline="2026-10-30T17:00:00+05:30"' in page
 
 
+def test_deadline_shown_as_readable_text(client):
+    assert "Due 30 Oct 2026, 5:00 PM" in client.get("/notice/4").get_data(as_text=True)
+
+
+def test_next_deadline_picks_soonest_future_one():
+    past = {"deadline_iso": "2000-01-01T10:00:00+05:30", "title": "past"}
+    later = {"deadline_iso": "2099-06-01T10:00:00+05:30", "title": "later"}
+    sooner = {"deadline_iso": "2099-01-01T10:00:00+05:30", "title": "sooner"}
+    none = {"deadline_iso": None, "title": "no deadline"}
+    assert app_module.next_deadline([past, later, sooner, none])["title"] == "sooner"
+    assert app_module.next_deadline([past, none]) is None
+
+
 def test_footer_shows_local_badge_without_version_file(client):
     assert "vdev" in client.get("/").get_data(as_text=True)
 

@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 {% block title %}Not found{% endblock %}
 {% block content %}
-<h1>Not found</h1>
-<p class="empty">That page does not exist, or the notice has expired.</p>
-<p><a href="{{ url_for('index') }}">Back to the notice board</a></p>
+<div class="empty empty-page reveal">
+  <i class="ph ph-warning-circle" aria-hidden="true"></i>
+  <h1>This page isn't here.</h1>
+  <p>The link may be wrong, or the notice has expired and is no longer shown.</p>
+  <a class="button button-primary" href="{{ url_for('index') }}">Back to notices</a>
+</div>
 {% endblock %}

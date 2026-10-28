@@ -1,26 +1,54 @@
 {% extends "base.html" %}
 {% block title %}{{ notice.title }}{% endblock %}
 {% block content %}
-<p><a href="{{ url_for('index') }}">&larr; Back to notices</a></p>
+<a class="back-link" href="{{ url_for('index') }}"><i class="ph ph-caret-left" aria-hidden="true"></i>Notices</a>
 
-<article class="card notice detail cat-{{ notice.category|lower }}{% if notice.urgent %} urgent{% endif %}">
-  <div class="tags">
-    {% if notice.urgent %}<span class="tag tag-urgent">Urgent</span>{% endif %}
-    <span class="tag tag-{{ notice.category|lower }}">{{ notice.category }}</span>
-  </div>
-  <h1>{{ notice.title }}</h1>
-  <p class="lead">{{ notice.body }}</p>
-  <div class="meta">
-    <span>Posted {{ notice.posted_on|pretty_date }}</span>
-    <span>Expires {{ notice.expires_on|pretty_date }}</span>
+<div class="detail">
+  <article class="detail-main reveal" style="--i: 0">
+    <div class="tags">
+      {% if notice.urgent %}<span class="tag tag-urgent"><i class="ph-fill ph-push-pin" aria-hidden="true"></i>Urgent</span>{% endif %}
+      <span class="tag tag-{{ notice.category|lower }}">{{ notice.category }}</span>
+    </div>
+    <h1 class="detail-title">{{ notice.title }}</h1>
+    <p class="detail-body">{{ notice.body }}</p>
+
+    <dl class="inset-list">
+      <div class="inset-row">
+        <dt><i class="ph ph-calendar-blank" aria-hidden="true"></i>Posted</dt>
+        <dd>{{ notice.posted_on|pretty_date }}</dd>
+      </div>
+      {% if notice.deadline_iso %}
+      <div class="inset-row">
+        <dt><i class="ph ph-hourglass-medium" aria-hidden="true"></i>Deadline</dt>
+        <dd>{{ notice.deadline_text }}</dd>
+      </div>
+      {% endif %}
+      <div class="inset-row">
+        <dt><i class="ph ph-clock" aria-hidden="true"></i>Visible until</dt>
+        <dd>{{ notice.expires_on|pretty_date }}</dd>
+      </div>
+    </dl>
+  </article>
+
+  <aside class="detail-side">
     {% if notice.deadline_iso %}
-      <span class="countdown" data-deadline="{{ notice.deadline_iso }}">Due soon</span>
+      <div class="side-card reveal" style="--i: 1">
+        <span class="tile-label"><i class="ph ph-hourglass-medium" aria-hidden="true"></i>Time left</span>
+        <span class="clock clock-compact" data-clock="{{ notice.deadline_iso }}">
+          <span class="clock-unit"><span class="clock-num" data-unit="d">--</span><span class="clock-cap">days</span></span>
+          <span class="clock-unit"><span class="clock-num" data-unit="h">--</span><span class="clock-cap">hours</span></span>
+          <span class="clock-unit"><span class="clock-num" data-unit="m">--</span><span class="clock-cap">min</span></span>
+        </span>
+        <span class="countdown countdown-line" data-deadline="{{ notice.deadline_iso }}">Due {{ notice.deadline_text }}</span>
+      </div>
     {% endif %}
-  </div>
 
-  <div class="qr-box">
-    <img src="{{ url_for('notice_qr', notice_id=notice.id) }}" alt="QR code for this notice" width="180" height="180">
-    <p>Scan to open this notice on your phone.</p>
-  </div>
-</article>
+    <div class="side-card qr-card reveal" style="--i: 2">
+      <div class="qr-frame">
+        <img src="{{ url_for('notice_qr', notice_id=notice.id) }}" alt="QR code that opens this notice" width="176" height="176">
+      </div>
+      <p class="qr-caption"><i class="ph ph-qr-code" aria-hidden="true"></i>Scan to open this notice on your phone.</p>
+    </div>
+  </aside>
+</div>
 {% endblock %}

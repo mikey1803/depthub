@@ -46,18 +46,27 @@ def get_visible_notices(category=None):
         notice["posted_on"] = validate_data.parse_date(raw["posted_on"])
         notice["expires_on"] = expires_on
         deadline = raw.get("deadline")
-        # Send the deadline with its time zone so the browser countdown is exact
-        notice["deadline_iso"] = (
-            validate_data.parse_datetime(deadline).replace(tzinfo=IST).isoformat()
-            if deadline
-            else None
-        )
+        notice["deadline_iso"] = None
+        notice["deadline_text"] = None
+        if deadline:
+            due = validate_data.parse_datetime(deadline).replace(tzinfo=IST)
+            # Send the deadline with its time zone so the browser countdown is exact
+            notice["deadline_iso"] = due.isoformat()
+            notice["deadline_text"] = f"{due.day} {due:%b %Y}, {due:%I:%M %p}".replace(", 0", ", ")
         notices.append(notice)
 
     if category:
         notices = [n for n in notices if n["category"] == category]
     notices.sort(key=lambda n: (not n["urgent"], -n["posted_on"].toordinal()))
     return notices
+
+
+def next_deadline(notices):
+    """The notice whose deadline comes soonest (and has not passed yet), or None."""
+    now = datetime.now(IST)
+    upcoming = [n for n in notices
+                if n["deadline_iso"] and datetime.fromisoformat(n["deadline_iso"]) > now]
+    return min(upcoming, key=lambda n: n["deadline_iso"], default=None)
 
 
 def get_notice(notice_id):
@@ -118,7 +127,7 @@ def inject_globals():
 
 @app.template_filter("pretty_date")
 def pretty_date(value):
-    return value.strftime("%d %b %Y")
+    return f"{value.day} {value:%b %Y}"
 
 
 # ---------- pages ----------
@@ -134,6 +143,7 @@ def index():
         "index.html",
         pinned=[n for n in notices if n["urgent"]],
         others=[n for n in notices if not n["urgent"]],
+        next_up=next_deadline(notices),
         categories=validate_data.CATEGORIES,
         selected=selected,
     )

@@ -1,39 +1,67 @@
 {% extends "base.html" %}
 {% block title %}Student Showcase{% endblock %}
 {% block content %}
-<h1>Student Showcase</h1>
-<p class="muted">Click a skill to see only the students who have it.</p>
+<header class="page-head reveal" style="--i: 0">
+  <h1 class="display display-sm">Student showcase.</h1>
+  <p class="lead">Projects and skills from students in the department. Pick a skill to see who works with it.</p>
+</header>
 
-<nav class="filter-bar" aria-label="Filter students by skill">
-  <a class="chip {% if not selected %}active{% endif %}" href="{{ url_for('students') }}">All</a>
-  {% for skill in skills %}
-    <a class="chip {% if selected == skill %}active{% endif %}" href="{{ url_for('students', skill=skill) }}">{{ skill }}</a>
-  {% endfor %}
-</nav>
-
-<div class="grid">
-  {% for student in students %}
-    <article class="card student">
-      <h3>{{ student.name }}</h3>
-      <p class="role">{{ student.role }}</p>
-      <div class="skills">
-        {% for skill in student.skills %}
-          <a class="chip small {% if selected == skill %}active{% endif %}" href="{{ url_for('students', skill=skill) }}">{{ skill }}</a>
-        {% endfor %}
-      </div>
-      {% if student.projects %}
-        <h4>Projects</h4>
-        <ul class="projects">
-          {% for project in student.projects %}
-            <li>
-              <a href="{{ project.link }}" target="_blank" rel="noopener">{{ project.title }}</a>
-              <span>{{ project.description }}</span>
-            </li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-      <a class="github" href="https://github.com/{{ student.github }}" target="_blank" rel="noopener">github.com/{{ student.github }}</a>
-    </article>
-  {% endfor %}
+<div class="toolbar">
+  <nav class="pills" aria-label="Filter students by skill">
+    <a class="pill" href="{{ url_for('students') }}" {% if not selected %}aria-current="true"{% endif %}>All</a>
+    {% for skill in skills %}
+      <a class="pill" href="{{ url_for('students', skill=skill) }}" {% if selected == skill %}aria-current="true"{% endif %}>{{ skill }}</a>
+    {% endfor %}
+  </nav>
 </div>
+
+{% if selected %}
+  <p class="result-line">{{ students|length }} student{{ '' if students|length == 1 else 's' }} with <strong>{{ selected }}</strong> <a href="{{ url_for('students') }}">Clear filter</a></p>
+{% endif %}
+
+{% if students %}
+  <div class="grid grid-students">
+    {% for student in students %}
+      <article class="card student reveal" style="--i: {{ loop.index0 }}">
+        <div class="student-head">
+          <span class="monogram" aria-hidden="true">{{ student.name.split()|map('first')|join('')|upper }}</span>
+          <div>
+            <h3 class="student-name">{{ student.name }}</h3>
+            <p class="student-role">{{ student.role }}</p>
+          </div>
+        </div>
+
+        <div class="skills">
+          {% for skill in student.skills %}
+            <a class="pill pill-small" href="{{ url_for('students', skill=skill) }}" {% if selected == skill %}aria-current="true"{% endif %}>{{ skill }}</a>
+          {% endfor %}
+        </div>
+
+        {% if student.projects %}
+          <ul class="projects">
+            {% for project in student.projects %}
+              <li>
+                <a class="project-link" href="{{ project.link }}" target="_blank" rel="noopener">
+                  <span class="project-title">{{ project.title }}<i class="ph ph-arrow-up-right" aria-hidden="true"></i></span>
+                  <span class="project-desc">{{ project.description }}</span>
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+        <a class="github" href="https://github.com/{{ student.github }}" target="_blank" rel="noopener">
+          <i class="ph ph-github-logo" aria-hidden="true"></i>{{ student.github }}
+        </a>
+      </article>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty">
+    <i class="ph ph-user-circle" aria-hidden="true"></i>
+    <h2>No students match.</h2>
+    <p>Nobody lists that skill yet.</p>
+    <a class="button button-primary" href="{{ url_for('students') }}">Show everyone</a>
+  </div>
+{% endif %}
 {% endblock %}

@@ -1,30 +1,45 @@
 {% extends "base.html" %}
 {% block title %}Deployment History{% endblock %}
 {% block content %}
-<h1>Deployment History</h1>
-<p class="muted">Every deployment made by the Jenkins pipeline, newest first.</p>
+<header class="page-head reveal" style="--i: 0">
+  <h1 class="display display-sm">Deployments.</h1>
+  <p class="lead">Every release shipped by the Jenkins pipeline, newest first. Failed releases are rolled back automatically.</p>
+</header>
 
 {% if history %}
-  <div class="table-wrap">
-    <table class="deploys">
-      <thead>
-        <tr><th>Build</th><th>Commit</th><th>Message</th><th>Author</th><th>When</th><th>Result</th></tr>
-      </thead>
-      <tbody>
-        {% for d in history %}
-          <tr>
-            <td>v{{ d.build }}</td>
-            <td><code>{{ d.commit_short or (d.commit or '')[:7] }}</code></td>
-            <td>{{ d.message }}</td>
-            <td>{{ d.author }}</td>
-            <td>{{ d.timestamp }}<br><span class="muted">{{ d.ago }}</span></td>
-            <td><span class="tag {% if d.status == 'success' %}tag-ok{% else %}tag-urgent{% endif %}">{{ d.status or 'success' }}</span></td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+  {% set state = namespace(live_found=false) %}
+  <ol class="timeline">
+    {% for d in history %}
+      {% set ok = (d.status or 'success') == 'success' %}
+      {# Only the newest successful release is the one serving traffic #}
+      {% set is_live = ok and not state.live_found %}
+      {% if is_live %}{% set state.live_found = true %}{% endif %}
+      <li class="release {{ 'is-ok' if ok else 'is-rolled-back' }} reveal" style="--i: {{ loop.index0 }}" data-status="{{ d.status or 'success' }}">
+        <span class="release-icon" aria-hidden="true">
+          <i class="ph-fill {{ 'ph-check-circle' if ok else 'ph-arrow-counter-clockwise' }}"></i>
+        </span>
+        <div class="release-main">
+          <p class="release-message">{{ d.message }}</p>
+          <p class="release-meta">
+            <span class="release-build">v{{ d.build }}</span>
+            <span class="mono"><i class="ph ph-git-commit" aria-hidden="true"></i>{{ d.commit_short or (d.commit or '')[:7] }}</span>
+            <span>{{ d.author }}</span>
+          </p>
+        </div>
+        <div class="release-side">
+          {% if is_live %}<span class="status status-ok">Live</span>
+          {% elif ok %}<span class="status status-done">Deployed</span>
+          {% else %}<span class="status status-bad">Rolled back</span>{% endif %}
+          <time datetime="{{ d.timestamp }}" title="{{ d.timestamp }}">{{ d.ago }}</time>
+        </div>
+      </li>
+    {% endfor %}
+  </ol>
 {% else %}
-  <p class="empty">No deployments recorded yet.</p>
+  <div class="empty reveal">
+    <i class="ph ph-git-commit" aria-hidden="true"></i>
+    <h2>No deployments yet.</h2>
+    <p>The first successful Jenkins build will appear here.</p>
+  </div>
 {% endif %}
 {% endblock %}

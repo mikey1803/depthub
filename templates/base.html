@@ -2,42 +2,59 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>{% block title %}DeptHub{% endblock %} · AI &amp; DS, Karunya</title>
+  <meta name="description" content="Notices, deadlines and student work from the Department of Artificial Intelligence and Data Science, Karunya Institute of Technology and Sciences.">
+  <meta name="color-scheme" content="light dark">
   <script>
-    // Apply the saved theme before the page paints (no flash). Storage can be blocked, so try/catch.
+    // Runs before paint: mark JS as available (enables reveal animations) and apply the saved theme.
+    // Storage can be blocked (private mode), so it is wrapped in try/catch.
     (function () {
+      var root = document.documentElement;
+      root.classList.add("js");
       try {
         var saved = localStorage.getItem("theme");
-        if (saved) { document.documentElement.setAttribute("data-theme", saved); }
+        if (saved === "light" || saved === "dark") { root.setAttribute("data-theme", saved); }
       } catch (e) {}
     })();
   </script>
+  <!-- Phosphor icons (open-source icon set, closest web analogue to SF Symbols), pinned version -->
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a class="brand" href="{{ url_for('index') }}">
-        <span class="brand-name">DeptHub</span>
-        <span class="brand-sub">Dept. of Artificial Intelligence and Data Science<br>Karunya Institute of Technology and Sciences</span>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav">
+    <div class="nav-inner container">
+      <a class="brand" href="{{ url_for('index') }}" aria-label="DeptHub home">
+        <span class="brand-mark" aria-hidden="true">D</span>
+        <span class="brand-text">
+          <span class="brand-name">DeptHub</span>
+          <span class="brand-dept">AI &amp; Data Science, Karunya</span>
+        </span>
       </a>
-      <nav class="nav">
-        <a href="{{ url_for('index') }}" {% if request.endpoint in ('index', 'notice_detail') %}class="active"{% endif %}>Notices</a>
-        <a href="{{ url_for('students') }}" {% if request.endpoint == 'students' %}class="active"{% endif %}>Students</a>
-        <a href="{{ url_for('deploys') }}" {% if request.endpoint == 'deploys' %}class="active"{% endif %}>Deploys</a>
-        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode">Theme</button>
+      <nav class="nav-links" aria-label="Main">
+        <a href="{{ url_for('index') }}" {% if request.endpoint in ('index', 'notice_detail') %}aria-current="page"{% endif %}>Notices</a>
+        <a href="{{ url_for('students') }}" {% if request.endpoint == 'students' %}aria-current="page"{% endif %}>Students</a>
+        <a href="{{ url_for('deploys') }}" {% if request.endpoint == 'deploys' %}aria-current="page"{% endif %}>Deploys</a>
       </nav>
+      <button id="theme-toggle" class="icon-button" type="button" aria-label="Switch between light and dark mode">
+        <i class="ph ph-moon icon-moon" aria-hidden="true"></i>
+        <i class="ph ph-sun icon-sun" aria-hidden="true"></i>
+      </button>
     </div>
   </header>
 
-  <main class="container">
+  <main id="main" class="container">
     {% block content %}{% endblock %}
   </main>
 
-  <footer class="site-footer">
-    <div class="container">
-      <span class="version-badge">
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p class="footer-dept">Department of Artificial Intelligence and Data Science<br>Karunya Institute of Technology and Sciences</p>
+      <span class="version-badge" title="Build information from version.json">
         v{{ version.build }} · commit {{ version.commit_short }}
         {% if version.deployed_ago %}· deployed {{ version.deployed_ago }}{% else %}· running locally{% endif %}
       </span>

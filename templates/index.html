@@ -1,35 +1,81 @@
 {% extends "base.html" %}
 {% block title %}Notice Board{% endblock %}
 {% block content %}
-<h1>Notice Board</h1>
 
-<nav class="filter-bar" aria-label="Filter notices by category">
-  <a class="chip {% if not selected %}active{% endif %}" href="{{ url_for('index') }}">All</a>
-  {% for category in categories %}
-    <a class="chip chip-{{ category|lower }} {% if selected == category %}active{% endif %}"
-       href="{{ url_for('index', category=category) }}">{{ category }}</a>
-  {% endfor %}
-</nav>
+<section class="hero">
+  <div class="hero-copy reveal" style="--i: 0">
+    <h1 class="display">Notices from AI&nbsp;&amp; Data&nbsp;Science.</h1>
+    <p class="lead">Exams, events and placement updates from the department, kept current with every commit.</p>
+    <div class="hero-actions">
+      <a class="button button-primary" href="#notices">Browse notices</a>
+      <a class="button button-plain" href="{{ url_for('students') }}">Student showcase <i class="ph ph-arrow-right" aria-hidden="true"></i></a>
+    </div>
+  </div>
+
+  {% if next_up %}
+    <a class="hero-tile reveal" style="--i: 1" href="{{ url_for('notice_detail', notice_id=next_up.id) }}"
+       aria-label="Next deadline: {{ next_up.title }}, due {{ next_up.deadline_text }}">
+      <span class="tile-label"><i class="ph ph-clock" aria-hidden="true"></i>Next deadline</span>
+      <span class="tile-title">{{ next_up.title }}</span>
+      <span class="clock" data-clock="{{ next_up.deadline_iso }}">
+        <span class="clock-unit"><span class="clock-num" data-unit="d">--</span><span class="clock-cap">days</span></span>
+        <span class="clock-unit"><span class="clock-num" data-unit="h">--</span><span class="clock-cap">hours</span></span>
+        <span class="clock-unit"><span class="clock-num" data-unit="m">--</span><span class="clock-cap">min</span></span>
+      </span>
+      <span class="tile-foot">
+        <span>Due {{ next_up.deadline_text }}</span>
+        <i class="ph ph-arrow-right" aria-hidden="true"></i>
+      </span>
+    </a>
+  {% else %}
+    <div class="hero-tile hero-tile-quiet reveal" style="--i: 1">
+      <span class="tile-label"><i class="ph ph-check-circle" aria-hidden="true"></i>All clear</span>
+      <span class="tile-title">No upcoming deadlines{% if selected %} in {{ selected }}{% endif %}.</span>
+      <span class="tile-foot"><span>{{ (pinned|length) + (others|length) }} active notice{{ '' if (pinned|length) + (others|length) == 1 else 's' }}</span></span>
+    </div>
+  {% endif %}
+</section>
+
+<div id="notices" class="toolbar">
+  <nav class="segmented" aria-label="Filter notices by category">
+    <a class="segment" href="{{ url_for('index') }}#notices" {% if not selected %}aria-current="true"{% endif %}>All</a>
+    {% for category in categories %}
+      <a class="segment" href="{{ url_for('index', category=category) }}#notices" {% if selected == category %}aria-current="true"{% endif %}>
+        <span class="dot dot-{{ category|lower }}" aria-hidden="true"></span>{{ category }}
+      </a>
+    {% endfor %}
+  </nav>
+</div>
 
 {% if pinned %}
-  <section>
-    <h2 class="section-title pinned-title">Pinned: urgent</h2>
-    <div class="grid">
-      {% for notice in pinned %}{% include "_notice_card.html" %}{% endfor %}
+  <section class="section" aria-labelledby="pinned-heading">
+    <h2 id="pinned-heading" class="section-title section-title-urgent">
+      <i class="ph-fill ph-push-pin" aria-hidden="true"></i>Pinned
+    </h2>
+    <div class="grid grid-pinned">
+      {% for notice in pinned %}{% set idx = loop.index0 %}{% set featured = false %}{% include "_notice_card.html" %}{% endfor %}
     </div>
   </section>
 {% endif %}
 
 {% if others %}
-  <section>
-    {% if pinned %}<h2 class="section-title">Other notices</h2>{% endif %}
-    <div class="grid">
-      {% for notice in others %}{% include "_notice_card.html" %}{% endfor %}
+  <section class="section" aria-labelledby="all-heading">
+    <h2 id="all-heading" class="section-title">{% if selected %}{{ selected }} notices{% else %}Latest notices{% endif %}</h2>
+    <div class="grid grid-notices">
+      {# The first card's shape depends on the count so the 3-column grid never leaves empty cells:
+         3, 6, ... notices -> tall 2x2 tile; 1, 4, ... -> full-width; 2, 5, ... -> 2 columns wide #}
+      {% set shape = ['tall', 'full', 'wide'][others|length % 3] %}
+      {% for notice in others %}{% set idx = loop.index0 %}{% set featured = shape if loop.first else false %}{% include "_notice_card.html" %}{% endfor %}
     </div>
   </section>
 {% endif %}
 
 {% if not pinned and not others %}
-  <p class="empty">No active notices{% if selected %} in {{ selected }}{% endif %}.</p>
+  <div class="empty reveal">
+    <i class="ph ph-megaphone" aria-hidden="true"></i>
+    <h2>Nothing here right now.</h2>
+    <p>There are no active {% if selected %}{{ selected|lower }} {% endif %}notices. New ones appear here as soon as they are pushed.</p>
+    {% if selected %}<a class="button button-primary" href="{{ url_for('index') }}">Show all notices</a>{% endif %}
+  </div>
 {% endif %}
 {% endblock %}
